@@ -9,7 +9,7 @@ import { Reclaim, Proof } from '@reclaimprotocol/js-sdk';
 import { data } from 'autoprefixer';
 import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi'
-import { JsonViewer} from '@textea/json-viewer'
+import { JsonViewer } from '@textea/json-viewer'
 import { stack } from './_app';
 
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID!
@@ -17,7 +17,7 @@ const APP_SECRET = process.env.NEXT_PUBLIC_APP_SECRET!
 
 
 const providers = [
-  {name: 'Github Total Repo', providerId: '5622b4ea-b953-4cd9-a377-409bb7ed5ec5'},
+  { name: 'Github Total Repo', providerId: '5622b4ea-b953-4cd9-a377-409bb7ed5ec5' },
 ];
 
 
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
   const [showLeaderBoard, setShowLeaderBoard] = useState(false)
 
   const urlRef = useRef(null);
-  
+
 
   const reclaimClient = new Reclaim.ProofRequest(APP_ID);
 
@@ -53,19 +53,19 @@ const Home: NextPage = () => {
       await navigator.clipboard.writeText(url);
       setIsCopied(true);
       console.log('Link copied to clipboard');
-    } catch(err) {
+    } catch (err) {
       console.error('Failed to copy link: ', err);
     }
   };
 
-  const addPoints = async(address: string, points: number) => {
-    try{
+  const addPoints = async (address: string, points: number) => {
+    try {
       stack.track('repos', {
         account: address,
         points: points,
         uniqueId: address,
       })
-    } catch(error) {
+    } catch (error) {
       console.error('Error in addPoints', error)
     }
   }
@@ -73,8 +73,9 @@ const Home: NextPage = () => {
   const getVerificationReq = async (providerId: string) => {
     try {
       setIsLoaded(true)
-      const sessionData = await reclaimClient.buildProofRequest(providerId, false, 'V2Linking')
+      const sessionData = await reclaimClient.buildProofRequest(providerId, true, 'V2Linking')
       reclaimClient.setSignature(await reclaimClient.generateSignature(APP_SECRET))
+      reclaimClient.setRedirectUrl('https://reclaim-stackso.vercel.app/')
 
       const { requestUrl, statusUrl } = await reclaimClient.createVerificationRequest()
       console.log('requestUrl', requestUrl)
@@ -92,7 +93,7 @@ const Home: NextPage = () => {
           setProofs(proofs[0])
           const points = JSON.parse(proofs[0]?.claimData?.context)?.extractedParameters?.repositories ?? '0'
           addPoints(address!, parseInt(points ?? 0))
-          
+
           setShowQR(false)
         },
         onFailureCallback: error => {
@@ -101,7 +102,7 @@ const Home: NextPage = () => {
           console.log('error', error)
         }
       })
-    } catch(error) {
+    } catch (error) {
       console.error('Error in getVerificationReq', error)
       // Handle error gracefully, e.g., show a notification to the user
       // and possibly revert UI changes made before the error occurred
@@ -116,7 +117,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    if(!selectedProviderId && isConnected && address) {
+    if (!selectedProviderId && isConnected && address) {
       setSelectedProviderId(myProviders[0].providerId)
       setShowQR(false);
       setShowButton(false);
@@ -130,7 +131,7 @@ const Home: NextPage = () => {
 
     let isMobileDevice = regexp.test(details);
 
-    if(isMobileDevice) {
+    if (isMobileDevice) {
       setIsMobileDevice(true)
     } else {
       setIsMobileDevice(false)
@@ -140,14 +141,14 @@ const Home: NextPage = () => {
 
 
   useEffect(() => {
-    if(proofs) {
+    if (proofs) {
       setShowConfetti(true);
     }
   }, [proofs]);
 
 
 
-  
+
   return (
     <div className={styles.container}>
       <Head>
@@ -158,9 +159,9 @@ const Home: NextPage = () => {
         />
         <link href="/favicon.ico" rel="icon" />
       </Head>
-    
-   
-      <div 
+
+
+      <div
         style={{
           position: 'absolute',
           right: '0',
@@ -176,47 +177,47 @@ const Home: NextPage = () => {
           color: '#fff',
           borderRadius: '0 0 0 10px',
         }}
-        >
+      >
 
 
         <button
-  style={{
-    backgroundColor: '#0d76fc',
-    color: '#fff',
-    padding: '0.75rem 1.5rem',
-    border: 'none',
-    borderRadius: '0.5rem',
-    fontSize: '1rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease, transform 0.2s ease',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  }}
-  onMouseOver={(e: any) => {
-    e.target.style.backgroundColor = '#0b5dc2';
-    e.target.style.transform = 'scale(1.05)';
-  }}
-  onMouseOut={(e: any) => {
-    e.target.style.backgroundColor = '#0d76fc';
-    e.target.style.transform = 'scale(1)';
-  }}
-  onClick={() => setShowLeaderBoard(!showLeaderBoard)}
->
-  {showLeaderBoard ? 'Hide Leaderboard' : 'Show Leaderboard'}
-</button>
-      {isConnected && (
-          <ConnectButton label='Connect Wallet' 
-          chainStatus='none'
-          accountStatus='address'
-          showBalance={false}
-          /> )}
-        </div>
+          style={{
+            backgroundColor: '#0d76fc',
+            color: '#fff',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '0.5rem',
+            fontSize: '1rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease, transform 0.2s ease',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
+          onMouseOver={(e: any) => {
+            e.target.style.backgroundColor = '#0b5dc2';
+            e.target.style.transform = 'scale(1.05)';
+          }}
+          onMouseOut={(e: any) => {
+            e.target.style.backgroundColor = '#0d76fc';
+            e.target.style.transform = 'scale(1)';
+          }}
+          onClick={() => setShowLeaderBoard(!showLeaderBoard)}
+        >
+          {showLeaderBoard ? 'Hide Leaderboard' : 'Show Leaderboard'}
+        </button>
+        {isConnected && (
+          <ConnectButton label='Connect Wallet'
+            chainStatus='none'
+            accountStatus='address'
+            showBalance={false}
+          />)}
+      </div>
 
 
-   
+
       <main className={styles.main}>
-      <h1 className={styles.title}>
-         Reclaim - Stack Demo
+        <h1 className={styles.title}>
+          Reclaim - Stack Demo
         </h1>
 
         <p className={styles.description}>
@@ -224,11 +225,11 @@ const Home: NextPage = () => {
         </p>
 
         {!showLeaderBoard && !isConnected && (
-        <ConnectButton label='Connect Wallet to Get Started'
-          chainStatus='none'
-          accountStatus='address'
-          showBalance={false}
-        />
+          <ConnectButton label='Connect Wallet to Get Started'
+            chainStatus='none'
+            accountStatus='address'
+            showBalance={false}
+          />
         )}
 
         {isLoaded && (<>
@@ -241,12 +242,12 @@ const Home: NextPage = () => {
 
           </div>
         </>)}
-          {
-            showLeaderBoard && (
-              <iframe src="https://www.stack.so/leaderboard/leaderboard-40a3-78225-3129/embed?excludeHeader=true" width="100%" height="600px" 
+        {
+          showLeaderBoard && (
+            <iframe src="https://www.stack.so/leaderboard/leaderboard-40a3-78225-3129/embed?excludeHeader=true" width="100%" height="600px"
               allow="clipboard-write"></iframe>
-            )
-          }
+          )
+        }
 
         {!showLeaderBoard && showQR && isConnected && (
           <>
@@ -262,69 +263,69 @@ const Home: NextPage = () => {
               </>
             )
             }
-           {isMobileDevice && (
-  <>
-    <button
-      onClick={() => window.open(url, "_blank")}
-      style={{
-        backgroundColor: '#38a169', // Green shade
-        color: '#fff',
-        fontWeight: 'bold',
-        padding: '0.5rem 1rem',
-        borderRadius: '0.375rem',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        transition: 'background-color 0.3s ease, transform 0.2s ease',
-        cursor: 'pointer',
-        fontSize: '1rem',
-        marginTop: '1rem',
-      }}
-      onMouseOver={(e: any) => {
-        e.target.style.backgroundColor = '#2f855a'; // Darker green on hover
-        e.target.style.transform = 'scale(1.05)';
-      }}
-      onMouseOut={(e: any) => {
-        e.target.style.backgroundColor = '#38a169';
-        e.target.style.transform = 'scale(1)';
-      }}
-    >
-      Generate Proof Link 🚀
-    </button>
-  </>
-)}
+            {isMobileDevice && (
+              <>
+                <button
+                  onClick={() => window.open(url, "_blank")}
+                  style={{
+                    backgroundColor: '#38a169', // Green shade
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.375rem',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    transition: 'background-color 0.3s ease, transform 0.2s ease',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    marginTop: '1rem',
+                  }}
+                  onMouseOver={(e: any) => {
+                    e.target.style.backgroundColor = '#2f855a'; // Darker green on hover
+                    e.target.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseOut={(e: any) => {
+                    e.target.style.backgroundColor = '#38a169';
+                    e.target.style.transform = 'scale(1)';
+                  }}
+                >
+                  Generate Proof Link 🚀
+                </button>
+              </>
+            )}
 
-<span
-  style={{
-    display: 'inline-block',
-    color: '#A0AEC0', // Light gray color for the text
-    marginTop: '1rem',
-  }}
->
-  <button
-    onClick={copyToClipboard}
-    style={{
-      border: '2px solid #718096', // Gray border
-      padding: '0.5rem 1rem',
-      marginTop: '1rem',
-      borderRadius: '0.375rem',
-      fontWeight: '600',
-      color: isCopied ? '#38a169' : '#718096', // Change text color when copied
-      backgroundColor: isCopied ? '#e6fffa' : 'transparent', // Light green background when copied
-      transition: 'background-color 0.3s ease, color 0.3s ease',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      cursor: 'pointer',
-    }}
-    onMouseOver={(e: any) => {
-      e.target.style.backgroundColor = '#E2E8F0'; // Light gray on hover
-      e.target.style.color = '#4A5568'; // Darker gray text on hover
-    }}
-    onMouseOut={(e: any) => {
-      e.target.style.backgroundColor = isCopied ? '#e6fffa' : 'transparent';
-      e.target.style.color = isCopied ? '#38a169' : '#718096';
-    }}
-  >
-    {isCopied ? 'Copied!' : 'Copy Link'}
-  </button>
-</span>
+            <span
+              style={{
+                display: 'inline-block',
+                color: '#A0AEC0', // Light gray color for the text
+                marginTop: '1rem',
+              }}
+            >
+              <button
+                onClick={copyToClipboard}
+                style={{
+                  border: '2px solid #718096', // Gray border
+                  padding: '0.5rem 1rem',
+                  marginTop: '1rem',
+                  borderRadius: '0.375rem',
+                  fontWeight: '600',
+                  color: isCopied ? '#38a169' : '#718096', // Change text color when copied
+                  backgroundColor: isCopied ? '#e6fffa' : 'transparent', // Light green background when copied
+                  transition: 'background-color 0.3s ease, color 0.3s ease',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  cursor: 'pointer',
+                }}
+                onMouseOver={(e: any) => {
+                  e.target.style.backgroundColor = '#E2E8F0'; // Light gray on hover
+                  e.target.style.color = '#4A5568'; // Darker gray text on hover
+                }}
+                onMouseOut={(e: any) => {
+                  e.target.style.backgroundColor = isCopied ? '#e6fffa' : 'transparent';
+                  e.target.style.color = isCopied ? '#38a169' : '#718096';
+                }}
+              >
+                {isCopied ? 'Copied!' : 'Copy Link'}
+              </button>
+            </span>
 
           </>
         )}
@@ -334,15 +335,15 @@ const Home: NextPage = () => {
               <h3 className="text-slate-300 
               text-center mx-auto
               text-sm lg:text-2xl md:text-xl sm:text-lg xs:text-xs mt-8">Proof Received</h3>
-                <p className="text-gray-300 text-center mx-auto text-sm lg:text-xl md:text-lg sm:text-lg xs:text-xs mt-4">
-                  Congratulations! you have earned {JSON.parse(proofs?.claimData?.context)?.extractedParameters?.repositories} points
-                </p>
-                {/* <p> {JSON.stringify(proofs?.claimData)}</p> */}
-                <JsonViewer value={proofs?.claimData}
-                 rootName='proof'
-                />
+              <p className="text-gray-300 text-center mx-auto text-sm lg:text-xl md:text-lg sm:text-lg xs:text-xs mt-4">
+                Congratulations! you have earned {JSON.parse(proofs?.claimData?.context)?.extractedParameters?.repositories} points
+              </p>
+              {/* <p> {JSON.stringify(proofs?.claimData)}</p> */}
+              <JsonViewer value={proofs?.claimData}
+                rootName='proof'
+              />
 
-        
+
 
               {showConfetti && (
                 <Confetti
@@ -355,7 +356,7 @@ const Home: NextPage = () => {
         }
 
 
-      
+
       </main>
 
     </div>

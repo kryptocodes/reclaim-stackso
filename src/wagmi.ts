@@ -10,7 +10,7 @@ import {
 
 export const config = getDefaultConfig({
   appName: 'Reclaim <> Stack.so demo ',
-  projectId: process.env.NEXT_WALLET_CONNECT_PROJECT_ID!,
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
   chains: [
     mainnet,
     polygon,
