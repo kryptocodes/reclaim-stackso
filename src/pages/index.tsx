@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi'
 import { JsonViewer } from '@textea/json-viewer'
 import { stack } from './_app';
+import { toast, Toaster } from 'react-hot-toast';
 
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID!
 const APP_SECRET = process.env.NEXT_PUBLIC_APP_SECRET!
@@ -48,6 +49,8 @@ const Home: NextPage = () => {
 
   const reclaimClient = new Reclaim.ProofRequest(APP_ID);
 
+  
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(url);
@@ -60,6 +63,11 @@ const Home: NextPage = () => {
 
   const addPoints = async (address: string, points: number) => {
     try {
+      const checkUser = await stack.getPoints(address)
+      if(checkUser){
+        await toast.error('User already submitted proof')
+        return
+      }
       stack.track('repos', {
         account: address,
         points: points,
@@ -75,7 +83,7 @@ const Home: NextPage = () => {
       setIsLoaded(true)
       const sessionData = await reclaimClient.buildProofRequest(providerId, true, 'V2Linking')
       reclaimClient.setSignature(await reclaimClient.generateSignature(APP_SECRET))
-      reclaimClient.setRedirectUrl('https://reclaim-stackso.vercel.app/')
+      reclaimClient.setRedirectUrl('https://reclaim-stackso.vercel.app')
 
       const { requestUrl, statusUrl } = await reclaimClient.createVerificationRequest()
       console.log('requestUrl', requestUrl)
@@ -89,11 +97,12 @@ const Home: NextPage = () => {
       await reclaimClient.startSession({
         onSuccessCallback: proofs => {
           console.log('Verification success', proofs)
+          setShowLeaderBoard(false)
           // Your business logic here
           setProofs(proofs[0])
           const points = JSON.parse(proofs[0]?.claimData?.context)?.extractedParameters?.repositories ?? '0'
           addPoints(address!, parseInt(points ?? 0))
-
+          setShowConfetti(true);
           setShowQR(false)
         },
         onFailureCallback: error => {
@@ -109,12 +118,12 @@ const Home: NextPage = () => {
     }
   }
 
-  console.log('proofs', proofs)
   const handleButtonClick = (providerId: string) => {
     setIsCopied(false)
     setProofs(null)
     getVerificationReq(providerId)
   }
+
 
   useEffect(() => {
     if (!selectedProviderId && isConnected && address) {
@@ -140,24 +149,19 @@ const Home: NextPage = () => {
   }, [])
 
 
-  useEffect(() => {
-    if (proofs) {
-      setShowConfetti(true);
-    }
-  }, [proofs]);
-
-
-
 
   return (
     <div className={styles.container}>
+      <Toaster 
+        position='top-right'
+        />
       <Head>
-        <title>Reclaim - Stack Demo</title>
+        <title>Get Rewarded based on Github Activity</title>
         <meta
-          content="Reclaim - Stack Demo"
+          content="Prove your Github Total Repositories with Reclaim Protocol and Earn Points on Stack"
           name="description"
         />
-        <link href="/favicon.ico" rel="icon" />
+        <link href="/logo.png" rel="icon" />
       </Head>
 
 
@@ -217,7 +221,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Reclaim - Stack Demo
+        Get Rewarded based on Github Activity
         </h1>
 
         <p className={styles.description}>
@@ -330,7 +334,7 @@ const Home: NextPage = () => {
           </>
         )}
         {
-          proofs && (
+          !showLeaderBoard && proofs && (
             <>
               <h3 className="text-slate-300 
               text-center mx-auto
