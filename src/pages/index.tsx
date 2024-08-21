@@ -10,7 +10,7 @@ import { data } from 'autoprefixer';
 import { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi'
 import { JsonViewer } from '@textea/json-viewer'
-import { stack } from './_app';
+
 import { toast, Toaster } from 'react-hot-toast';
 
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID!
@@ -63,16 +63,14 @@ const Home: NextPage = () => {
 
   const addPoints = async (address: string, points: number) => {
     try {
-      const checkUser = await stack.getPoints(address)
-      if(checkUser){
-        await toast.error('User already submitted proof')
-        return
-      }
-      stack.track('repos', {
-        account: address,
-        points: points,
-        uniqueId: address,
-      })
+      const req = await fetch('/api/stack', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address, points }),
+      });
+      console.log('req', req)
     } catch (error) {
       console.error('Error in addPoints', error)
     }
