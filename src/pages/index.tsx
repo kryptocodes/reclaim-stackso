@@ -246,7 +246,7 @@ const Home: NextPage = () => {
         </>)}
         {
           showLeaderBoard && (
-            <iframe src="https://www.stack.so/leaderboard/leaderboard-40a3-78225-3129/embed?excludeHeader=true" width="100%" height="600px"
+            <iframe src="https://www.stack.so/leaderboard/reclaim-github-leaderboard/embed?excludeHeader=true" width="100%" height="600px"
               allow="clipboard-write"></iframe>
           )
         }
